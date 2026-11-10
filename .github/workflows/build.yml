@@ -22,13 +22,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.5'
+          cache-disabled: true
+
+      - name: Prepare Android SDK & Licenses
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Build Debug APK
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
         run: gradle assembleDebug --stacktrace --no-daemon
 
       - name: Upload APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: PhotoToPdf-Debug-APK
